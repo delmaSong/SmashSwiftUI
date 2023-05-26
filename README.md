@@ -1,4 +1,5 @@
-# 01.SwiftUI Essentials
+# Summary
+## 01.SwiftUI Essentials
 - 작성된 코드가 언제나 뷰의 the source of truth로서 역할을 하기 때문에 Inspector를 통해 속성을 변경하면 코드에 바로 반영됨
 
 ### App Protocol
@@ -45,3 +46,14 @@ struct LandmarkList_Previews: PreviewProvider {
     // Landmark가 Identifiable 을 따르지 않지만 구별 가능한 유일한 속성이 있을 때
     List(landmarks, id: \.id) { landmark in ... }
     ```
+
+## 02. Drawing and Animation
+### GeometryReader
+컨텐츠의 사이즈와 위치를 함수로 나타내는 컨테이너 뷰로, 부모 레이아웃의 flexible preferred size를 반환함
+
+앱의 다른 위치나 크기가 다른 디스플레이에서 뷰를 재사용할 때 올바르지 않을 수 있는 하드코딩 숫자 대신 `GeometryReader`를 사용하여 뷰를 동적으로 그리고 위치를 지정하고 크기를 조정함
+`GeometryReader`는 상위 뷰와 기기에 대한 크기 및 위치 정보를 동적으로 보고하고 예를 들어 사용자가 iPhone을 회전할 때처럼 크기가 변경될 때마다 업데이트함
+
+컨테이너 뷰의 좌표와 크기에 접근할 수 있는 프록시인 `GeometryProxy`를 이용해 초기화함
+
+`GeometryReader`는 기하학적인 정보를 가지고 있는 컨테이너 뷰 자체이고, 그 정보에 접근하기 위해서는 `GeometryProxy`의 `frame(in:)`, `size`, `safeAreaInsets`등을이용
