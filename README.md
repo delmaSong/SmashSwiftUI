@@ -57,3 +57,87 @@ struct LandmarkList_Previews: PreviewProvider {
 컨테이너 뷰의 좌표와 크기에 접근할 수 있는 프록시인 `GeometryProxy`를 이용해 초기화함
 
 `GeometryReader`는 기하학적인 정보를 가지고 있는 컨테이너 뷰 자체이고, 그 정보에 접근하기 위해서는 `GeometryProxy`의 `frame(in:)`, `size`, `safeAreaInsets`등을이용
+
+# 03. App Design and Layout
+
+### WindowGroup
+뷰 계층구조를 담는 container의 역할로 동일한 구조의 윈도우(identically structured windows) 그룹을 표시하는 `Scene`
+그룹의 컨텐츠로 선언된 계층구조는 해당 그룹에서 생성하는 각 윈도우의 템플릿 역할을 함..
+그룹의 모든 윈도우는 독립적인 상태를 유지하는데 예를들어 scene의 뷰 계층에서 인스턴스화되는 `State`나 `StateObject` 변수들을 위해 시스템이 새로운 저장소 할당을 해주는 그룹이 있으며, 해당 그룹으로부터 각각의 새로운 윈도우가 생성됨
+
+### NavigationView
+iOS 기준 16.4부터 deprecated 되어 `NavigationStack`과 `NavigationSplitView` 사용이 권장됨
+
+### NavigationStack
+iOS 16 이상부터 사용 가능. 루트뷰를 표시하고 루트뷰 위에 추가적인 뷰들을 표시할 수 있게 하는 뷰로 Data와 Root를 가짐
+
+```swift
+struct NavigationStack<Data, Root> Where Root: View
+```
+
+네비게이션 링크를 만들려면 스택뷰의 계층구조 내에 `navigationDestination(for:destination:)`을 추가해 전달하고자 하는 데이터와 연결해야 함. 그런다음 같은 유형의 데이터를 표시하는 `NavigationLink`를 초기화 함.
+그리고 스택의 path를 관리하고싶다면 `NavigationStack` 생성시 `NavigationPath` 를 전달해 뷰를 빠져나가거나 최상단으로 이동하는 등의 관리를 할 수 있음
+
+```swift
+import SwiftUI
+
+struct ContentView: View {
+	@State var stack = NavigationPath()
+
+	var body: some View {
+		NavigationStack(path: $stack) {
+	    List(parks) { park in
+	        NavigationLink(park.name, value: park)
+	    }
+	    .navigationDestination(for: Park.self) { park in
+	        ParkDetails(park: park)
+					Button("Remove Last") {
+						stack.removeLast()
+					}
+					Button("Move to Root View") {
+						stack = .init()
+					}
+	    }
+		}
+	}
+}
+```
+
+### NavigationLink
+네비게이션 링크를 통해 뷰 전환을 할 수 있음. `View` 타입의 Label과 Destination을 가지는데, Label은 Destination으로 가는 gate로서 역할.
+
+```swift
+struct NavigationLink<Label, Destination> where Label : View, Destination : View
+```
+
+`NavigationStack`이나 `NavigationSplitView`내에 있는 `NavigationLink`를 통해 view를 표시하게 됨.
+1처럼 label 클로저 내에서 목적지에 대한 설명을 입력할 수 있고, 2처럼 간결하게 작성할 수도 있음
+
+```swift
+// 1
+NavigationLink {
+    FolderDetail(id: workFolder.id)
+} label: {
+    Label("Work Folder", systemImage: "folder")
+}
+
+// 2
+NavigationLink("Work Folder") {
+    FolderDetail(id: workFolder.id)
+}
+```
+
+### @Environment
+SwiftUI는 @Environment 속성 래퍼를 사용하여 액세스할 수 있는 값에 대한 환경 저장소를 제공합니다. editMode 값에 액세스하여 편집 범위를 읽거나 씁니다.
+
+..는 더 알아보기
+
+---
+
+- 예제는 json 데이터가 있어서 뷰를 그릴때 여기서 가져와서 보여주는데, 서버에서 데이터를 가져와야만 보여줄 수 있는 경우일땐 어케하려나? Profile.default 만들어둔것처럼 하는게 보편적이려나
+
+# 04. Framework Integration
+
+### UIViewControllerRepresentable
+
+### Coordinator
