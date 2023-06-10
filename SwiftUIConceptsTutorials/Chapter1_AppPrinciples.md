@@ -37,3 +37,26 @@ struct MyApp: App {
 SwiftUI에서 Scene에는 앱이 사용자 인터페이스로 표시하는 뷰 계층구조가 포함되어 있음.
 
 뷰 계층은 다른 뷰와 관련된 뷰의 레이아웃을 정의함. 해당 샘플에서 WindowGroup의 Scene에는 ContentView가 다른 뷰를 사용해 구성된 뷰의 계층구조가 포함되어 있음
+
+<img width="200" alt="1" src="https://github.com/delmaSong/SmashSwiftUI/assets/40784518/3d9dbcfc-1cd3-41a6-9981-c442e9def63e">
+
+```swift
+import SwiftUI
+
+// ContentView는 View 프로토콜을 준수하는 구조체임
+// 뷰는 일반적으로 다른 뷰들로 구성되며 뷰 계층 구조를 만듦
+struct ContentView: View {
+		// body의 구현은 App, Scene, View와 같은 프로토콜을 준수하는 경우에 볼 수 있는 일반적인 패턴
+    var body: some View {
+				// VStack은 하위 뷰가 화면에 보이든 안보이든 포함된 모든 뷰를 동시에 렌더링함
+				// 하위 뷰 수가 적은 경우에 사용하는 것이 이상적이고, 많은 하위 뷰를 표시해야 할 때는 화면에 표시될 때 렌더링되는 LazyVStack을 사용하는 것이 좋음
+        VStack {
+            Image(systemName: "globe")
+                .imageScale(.large)
+                .foregroundColor(.accentColor)
+            Text("Hello, world!")
+        }
+        .padding()
+    }
+}
+```
