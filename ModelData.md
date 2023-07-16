@@ -87,3 +87,40 @@ StateObject와 마찬가지로, SwiftUI가 제공하는 스토리지 관리와 �
 이 프로퍼티 래퍼를 사용해서 environment 값을 읽어올 수는 있지만 설정할 수는 없음. SwiftUI는 시스템 설정에 따라서 일부 environment 값을 자동으로 업데이트하거나 적절한 기본값을 제공하는 등의 역할을 함. 이 중 일부를 재정의 할 수 있는데, view의 `environment(_:_:)` 모디파이어를 통해서 할 수 있음.
 
 SwiftUI가 제공하는 environment 값의 전체 목록은 [EnvironmentValues](https://developer.apple.com/documentation/swiftui/environmentvalues) 구조체의 프로퍼티를 참고하면 되고, 유저 커스텀 environment 값을 만드려면 [EnvironmentKey](https://developer.apple.com/documentation/swiftui/environmentkey) 프로토콜을 참고하면 됨
+
+---
+
+# @Observable
+
+커스텀 타입 선언시 해당 매크로를 선언하여 관찰 가능한 상태로 만듦.
+이 매크로는 컴파일 타임에 해당 타입이 관찰 가능하도록 코드를 generate 하고 해당 타입의 저장 속성에 초점을 맞춤. (→ 보통 해당 타입의 저장 속성을 관찰하나 봄)
+참조타입과 값타입 모두에서 사용 가능함. 이 observable 매크로를 이용한 디자인 패턴을  Observation이라고 함. ([참고 링크](https://developer.apple.com/documentation/Observation))
+
+```swift
+@Observable
+class Car {
+    var name: String = ""
+    var needsRepairs: Bool = false
+
+    init(name: String, needsRepairs: Bool = false) {
+        self.name = name
+        self.needsRepairs = needsRepairs
+    }
+}
+```
+
+변경사항을 추적하려면 `[withObservationTracking(apply:onChange:)](https://developer.apple.com/documentation/observation/withobservationtracking(_:onchange:))` 함수를 사용하면 됨.
+
+다음 코드에서는 `car`의 `name`이 변경될 때 `onChange` 클로저를 호출함. 하지만 `needRepairs`가 변경된 경우에는 호출되지 않는데, 왜냐면 `apply` 인자로 넘긴 클로저 부분에서 `name`만 읽고 있고 `needRepairs`는 읽고있지 않기 때문.
+
+```swift
+func render() {
+    withObservationTracking {
+        for car in cars {
+            print(car.name)
+        }
+    } onChange: {
+        print("Schedule renderer.")
+    }
+}
+```
